@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.CommentDao">
+  	<!-- 게시글 등록 -->
+  	<insert id="insertCmnt" parameterType="CmntBoard">
+  		<selectKey keyProperty="channelCmntNo" resultType="int" order="BEFORE">
+			select FINAL_CHANNEL_CMNT_SEQ.nextval from dual
+		</selectKey>
+  		insert into final_cmnt_board
+  		(CHANNEL_CMNT_NO, CHANNEL_NO, CHANNEL_CMNT_TITLE, CHANNEL_CMNT_CONTENT, CHANNEL_CMNT_CREATE_DATE, CHANNEL_CMNT_FILE_PATH)
+  		values
+  		(#{channelCmntNo}, #{channelNo}, #{cmntTitle}, #{cmntContent}, sysdate, #{cmntFilePath})
+  	</insert>
+  	
+  	
+  	<!-- 게시글 댓글 등록 -->
+  	<insert id="insertCmntComment" parameterType="CmntComment">
+  		insert into final_cmnt_comment
+  		(CMNT_COMMENT_NO, CMNT_NO, CMNT_COMMENT_CONTENT, CMNT_COMMENT_CREATE_DATE, USER_NO)
+  		values
+  		(FINAL_CMNT_COMMENT_SEQ.nextval, #{cmntNo}, #{cmntComment}, sysdate, #{userNo})
+  	</insert>
+  	
+  	<!-- 채널번호에 해당하는 게시글 가져오가 -->
+  	<select id="getCmntByChannelNo" parameterType="int" resultType="CmntBoard">
+  		select
+  			CHANNEL_CMNT_NO					channelCmntNo,
+			CHANNEL_NO						channelNo,
+			CHANNEL_CMNT_TITLE				cmntTitle,
+			CHANNEL_CMNT_CONTENT			cmntContent,
+			CHANNEL_CMNT_CREATE_DATE		cmntCreateDate,
+			CHANNEL_CMNT_FILE_PATH			cmntFilePath
+  		from
+  			final_cmnt_board
+  		where
+  			channel_no = #{no}
+  	</select>
+  	
+  	<!-- 게시글번호에 해당하는 게시글조회하기 -->
+  	<select id="getCmntByCmntNo" parameterType="int" resultType="CmntBoard">
+  		select
+  			CHANNEL_CMNT_NO					channelCmntNo,
+			CHANNEL_NO						channelNo,
+			CHANNEL_CMNT_TITLE				cmntTitle,
+			CHANNEL_CMNT_CONTENT			cmntContent,
+			CHANNEL_CMNT_CREATE_DATE		cmntCreateDate,
+			CHANNEL_CMNT_FILE_PATH			cmntFilePath
+  		from
+  			final_cmnt_board
+  		where
+  			CHANNEL_CMNT_NO = #{no}
+  	</select>
+  	
+  	
+  	
+  	<!-- 전체 댓글 가져오기 -->
+  	<select id="getAllCmntComment" resultType="CmntComment">
+  		select
+  			CMNT_COMMENT_NO				cmntCommentNo,
+			CMNT_NO						cmntNo,
+			CMNT_COMMENT_CONTENT		cmntComment,
+			CMNT_COMMENT_CREATE_DATE	cmntCommentDate,
+			USER_NO						userNo
+		from
+			final_cmnt_comment
+  	</select>
+  	
+  	<!-- 게시글에 해당하는 유저정보 가져오기 -->
+  	<select id="getChannelCmntUserByChannelNo" parameterType="int" resultType="ChannelCmntUser">
+  		select
+  			a.CHANNEL_NO						channelNo,
+			a.USER_NO							userNo,
+			a.CHANNEL_TITLE						channelTitle,
+			a.CHANNEL_TAG						channelTag,
+			a.CHANNEL_ART_PATH					artPath,
+			a.CHANNEL_CONTENT					channelContent,
+			b.CHANNEL_CMNT_NO					channelCmntNo,
+			b.CHANNEL_CMNT_TITLE				cmntTitle,
+			b.CHANNEL_CMNT_CONTENT				cmntContent,
+			b.CHANNEL_CMNT_CREATE_DATE			cmntCreateDate,
+			b.CHANNEL_CMNT_FILE_PATH			cmntFilePath,
+			c.USER_ID							userId,
+			c.USER_PASSWORD						userPassword,
+			c.USER_NAME							userName,
+			c.USER_EMAIL						userEmail,
+			c.USER_CREATE_DATE					userCreateDate,
+			c.USER_BIRTHDAY						userBirthDay,
+			c.USER_IMAGE_PATH					userImagePath,
+			(select count(*) from FINAL_COMMUNITY_EMOTION Y where Y.CHANNEL_CMNT_NO = b.channel_cmnt_no and Y.COMUNITY_EMOTION = 1) likeCnt,
+			(select count(*) from FINAL_COMMUNITY_EMOTION Y where Y.CHANNEL_CMNT_NO = b.channel_cmnt_no and Y.COMUNITY_EMOTION = 2) hateCnt,
+			(select Y.COMUNITY_EMOTION from FINAL_COMMUNITY_EMOTION Y where Y.CHANNEL_CMNT_NO = b.channel_cmnt_no and Y.USER_NO = 10019) emotionCheck
+			
+  		from
+  			final_channel a, final_cmnt_board b, final_user c
+  		where
+  			a.channel_no = b.channel_no
+  		and
+  			a.user_no = c.user_no
+  		and
+  			a.channel_no = #{no}
+  		order by
+  			b.CHANNEL_CMNT_CREATE_DATE desc
+  	</select>
+  	
+  	<!-- 게시글번호에 해당하는 유저정보 가져오기 -->
+  	<select id="getChannelCmntUserByCmntNo" parameterType="int" resultType="ChannelCmntUser">
+  		select
+  			a.CHANNEL_NO						channelNo,
+			a.USER_NO							userNo,
+			a.CHANNEL_TITLE						channelTitle,
+			a.CHANNEL_TAG						channelTag,
+			a.CHANNEL_ART_PATH					artPath,
+			a.CHANNEL_CONTENT					channelContent,
+			b.CHANNEL_CMNT_NO					channelCmntNo,
+			b.CHANNEL_CMNT_TITLE				cmntTitle,
+			b.CHANNEL_CMNT_CONTENT				cmntContent,
+			b.CHANNEL_CMNT_CREATE_DATE			cmntCreateDate,
+			b.CHANNEL_CMNT_FILE_PATH			cmntFilePath,
+			c.USER_ID							userId,
+			c.USER_PASSWORD						userPassword,
+			c.USER_NAME							userName,
+			c.USER_EMAIL						userEmail,
+			c.USER_CREATE_DATE					userCreateDate,
+			c.USER_BIRTHDAY						userBirthDay,
+			c.USER_IMAGE_PATH					userImagePath
+  		from
+  			final_channel a, final_cmnt_board b, final_user c
+  		where
+  			a.channel_no = b.channel_no
+  		and
+  			a.user_no = c.user_no
+  		and
+  			b.CHANNEL_CMNT_NO = #{channelCmntNo}
+  		order by
+  			b.CHANNEL_CMNT_CREATE_DATE desc
+  	</select>
+  	
+  	<!-- 댓글번호에 해당하는 댓글 가져오기 -->
+  	<select id="getCmntCommentsByCmntNo" parameterType="int" resultType="CmntComment">
+  		select
+  			CMNT_COMMENT_NO				cmntCommentNo,
+			CMNT_NO						cmntNo,
+			CMNT_COMMENT_CONTENT		cmntComment,
+			CMNT_COMMENT_CREATE_DATE	cmntCommentDate,
+			USER_NO						userNo
+		from
+			final_cmnt_comment
+		where
+			CMNT_COMMENT_NO = #{no}
+  	</select>
+  	
+  	<!-- 게시글 번호에 해당하는 유저와 댓글정보 조회 -->
+  	<select id="getCmntCommentsUserByCmntNo" parameterType="int" resultType="CmntCommentUserDto">
+  		SELECT
+			a.CMNT_COMMENT_NO					cmntCommentNo,
+			a.CMNT_NO							cmntNo,
+			a.CMNT_COMMENT_CONTENT				cmntCommentContent,
+			a.CMNT_COMMENT_CREATE_DATE			cmntCommentCreateDate,
+			a.USER_NO							userNo,
+			b.USER_NAME							userName,
+			b.USER_IMAGE_PATH					userImagePath
+		FROM
+			FINAL_CMNT_COMMENT a, FINAL_USER b
+		where
+			a.USER_NO = b.USER_NO
+		and
+			a.CMNT_NO = #{no}
+		order by
+			a.CMNT_COMMENT_NO asc
+  	</select>
+  	
+  	<!-- 댓글 번호에 해당하는 유저와 댓글정보 조회 -->
+  	<select id="getCmntCommentsUserByCmntCommentNo" parameterType="int" resultType="CmntCommentUserDto">
+  		SELECT
+			a.CMNT_COMMENT_NO					cmntCommentNo,
+			a.CMNT_NO							cmntNo,
+			a.CMNT_COMMENT_CONTENT				cmntCommentContent,
+			a.CMNT_COMMENT_CREATE_DATE			cmntCommentCreateDate,
+			a.USER_NO							userNo,
+			b.USER_NAME							userName,
+			b.USER_IMAGE_PATH					userImagePath
+		FROM
+			FINAL_CMNT_COMMENT a, FINAL_USER b
+		where
+			a.USER_NO = b.USER_NO
+		and
+			a.CMNT_COMMENT_NO = #{no}
+		order by
+			a.CMNT_COMMENT_NO asc
+  	</select>
+  	
+  	<update id="updateCmntByCmntNo" parameterType="CmntBoard">
+  		update
+  			final_cmnt_board
+  		set
+  			CHANNEL_CMNT_TITLE = #{cmntTitle},
+  			CHANNEL_CMNT_FILE_PATH = #{cmntFilePath},
+  			CHANNEL_CMNT_CONTENT = #{cmntContent},
+			CHANNEL_CMNT_CREATE_DATE = sysdate
+  		where
+  			CHANNEL_CMNT_NO = #{channelCmntNo}
+  	</update>
+  	
+  	<delete id="deleteCmntByCmntNo" parameterType="int">
+  		delete from
+  			final_cmnt_board
+  		where
+  			CHANNEL_CMNT_NO = #{channelCmntNo}
+  	</delete>
+  	
+  	<update id="updateCmntComment" parameterType="CmntComment">
+  		update
+  			FINAL_CMNT_COMMENT
+  		set
+  			CMNT_COMMENT_CONTENT		= #{cmntComment},
+			CMNT_COMMENT_CREATE_DATE	= #{cmntCommnetDate}
+  		where
+  			CMNT_COMMENT_NO = #{cmntCommentNo}
+  	</update>
+  	
+  	<delete id="deleteCmntComment" parameterType="int">
+  		delete from 
+  			FINAL_CMNT_COMMENT
+  		where
+  			CMNT_COMMENT_NO = #{cmntCommentNo}
+  	</delete>
+  	
+  	<delete id="deleteCmntCommentAll" parameterType="int">
+  		delete from 
+  			FINAL_CMNT_COMMENT
+  		where
+  			CMNT_NO = #{cmntNo}
+  	</delete>
+</mapper>

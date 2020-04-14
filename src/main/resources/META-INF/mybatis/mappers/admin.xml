@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.AdminDao">
+  		<select id="getAdminById"  resultType="Admin">
+  		select
+			admin_no					admin_no,
+			admin_id					id,
+			admin_password			password,
+			admin_name				name,
+			admin_create_date		createDate
+		from
+			final_admin
+  		</select>
+  		
+  		<select id="getBeforeSevenDaysViews" parameterType="String" resultType="adminViewsByDate">
+  			select B.day as viewsCreateDate, nvl(cnt, 0) count
+				from (select to_char(views_create_date, 'yyyy-mm-dd') day, count(*) cnt
+			      from final_views 
+			      where 
+				    views_create_date  >= to_date(#{value}, 'yyyy-mm-dd') -7
+				    and views_create_date  &lt;= to_date(#{value}, 'yyyy-mm-dd') +1
+			      group by 
+				    to_char(views_create_date, 'yyyy-mm-dd')) A,
+				 (SELECT to_char(to_date(#{value})+1 - level , 'yyyy-mm-dd' ) day
+			      FROM dual
+			      CONNECT BY LEVEL &lt;= 7) B
+			where A.day(+) = B.day
+			order by B.day
+  		</select>
+  		
+  		<select id="getToDayDate"  resultType="adminViewsByDate">
+  			select B.day viewsCreateDate, nvl(count, 0) count
+				from (select to_char(views_create_date, 'yyyy-mm-dd') viewsCreateDate, count(*) count
+				      from final_views 
+				      where 
+					    views_create_date  >= to_date(to_char(sysdate - 7, 'yyyy-mm-dd'))
+					    and views_create_date  &lt;= to_date(to_char(sysdate + 1, 'yyyy-mm-dd'))
+				      group by 
+					    to_char(views_create_date, 'yyyy-mm-dd')) A,
+					 (SELECT to_char(sysdate+1 - (level), 'yyyy-mm-dd') day
+				      FROM dual
+				      CONNECT BY LEVEL &lt;= 7) B
+				where A.viewsCreateDate(+) = B.day
+				order by B.day
+  		</select>
+  		
+  		<select id="getToDayUpLoad" resultType="adminUploadByDate">
+  		select B.day viewsCreateDate, nvl(count, 0) count
+			from(select to_char(video_create_date, 'yyyy-mm-dd') day, count(*) count
+				from FINAL_VIDEO
+				WHERE
+					video_Create_date >= to_date(to_char(sysdate - 7, 'yyyy-mm-dd'))
+					and VIDEO_CREATE_DATE &lt;= to_Date(to_char(sysdate +1, 'yyyy-mm-dd'))
+				group by
+					to_char(VIDEO_CREATE_DATE,'yyyy-mm-dd')) A,
+					(select to_char(sysdate+1 - (level), 'yyyy-mm-dd') DAY
+					from dual
+					connect by level &lt;= 7) B
+				where A.day(+) = B.day
+				order by B.day
+  		</select>
+  		
+  		<select id="getDateToUpload" parameterType="String" resultType="adminUploadByDate">
+  			select B.day viewsCreateDate, nvl(count, 0) count
+			from(select to_char(video_create_date, 'yyyy-mm-dd') day, count(*) count
+				from FINAL_VIDEO
+				WHERE
+					video_Create_date >= to_date(#{value}, 'yyyy-mm-dd') -7
+					and VIDEO_CREATE_DATE &lt;= to_date(#{value}, 'yyyy-mm-dd')+1
+				group by
+					to_char(VIDEO_CREATE_DATE,'yyyy-mm-dd')) A,
+					(select to_char(to_date(#{value})+1 - (level), 'yyyy-mm-dd') DAY
+					from dual
+					connect by level &lt;= 7) B
+				where A.day(+) = B.day
+				order by B.day
+  		</select>
+  		
+  		<select id="getRecnetDataList" resultType="recentData">
+			  			select A.createDate createDate, A.userNo userNo, A.title title, A.type type, A.dataNo dataNo, B.user_id userId
+			from(select comment_create_date as createDate,
+					user_no as userNo,
+					COMMENT_CONTENT as title,
+					'commnet' as type,
+					COMMENT_NO as dataNo
+			from FINAL_COMMENT
+			UNION ALL
+			select video_create_date,
+					user_no,
+					video_contents,
+					'video',
+					video_no
+			from FINAL_VIDEO
+			UNION ALL
+			SELECT subcomment_create_date,
+					user_no,
+					subcomment_content,
+					'subcommnet',
+					subcomment_no
+			from FINAL_SUBCOMMENT
+			order by 1 desc) A, FINAL_USER B
+			where A.userNo = B.USER_NO
+  		</select>
+  		
+  		<select id="getRecentFiveData" resultType="recentData">
+  			select
+			createDate createDate, userNo userNo, title title, type type,dataNo dataNo,userId userId, no1
+		from(select A.createDate createDate, A.userNo userNo, A.title title, A.type type, A.dataNo dataNo, B.user_id userId,rownum as no1
+			from(select comment_create_date as createDate,
+					user_no as userNo,
+					COMMENT_CONTENT as title,
+					'commnet' as type,
+					COMMENT_NO as dataNo
+					
+			from FINAL_COMMENT
+			UNION ALL
+			select video_create_date,
+					user_no,
+					video_contents,
+					'video',
+					video_no
+			from FINAL_VIDEO
+			UNION ALL
+			SELECT subcomment_create_date,
+					user_no,
+					subcomment_content,
+					'subcommnet',
+					subcomment_no
+			from FINAL_SUBCOMMENT
+			order by 1 desc) A, FINAL_USER B
+			where A.userNo = B.USER_NO)
+		where no1 &lt;= 5
+  		</select>
+  		<select id="getRecentActivityByUserNo" parameterType="int" resultType="recentData">
+  		select
+			createDate, userNo, title, type,dataNo,userId, no1
+		from(select A.createDate createDate, A.userNo userNo, A.title title, A.type type, A.dataNo dataNo, B.user_id userId,rownum as no1
+			from(select comment_create_date as createDate,
+					user_no as userNo,
+					COMMENT_CONTENT as title,
+					'commnet' as type,
+					COMMENT_NO as dataNo
+			from FINAL_COMMENT
+			UNION ALL
+			select video_create_date,
+					user_no,
+					video_contents,
+					'video',
+					video_no
+			from FINAL_VIDEO
+			UNION ALL
+			SELECT subcomment_create_date,
+					user_no,
+					subcomment_content,
+					'subcommnet',
+					subcomment_no
+			from FINAL_SUBCOMMENT
+			order by 1 desc) A, FINAL_USER B
+			where A.userNo = B.USER_NO
+			and USER_NO = #{value})
+			where no1 &lt;= 3
+  		</select>
+  		
+  		<select id="getRecentOneData" resultType="recentData">
+  			select
+			createDate createDate, userNo userNo, title title, type type,dataNo dataNo,userId userId, no1 no1
+		from(select A.createDate createDate, A.userNo userNo, A.title title, A.type type, A.dataNo dataNo, B.user_id userId,rownum as no1
+			from(select comment_create_date as createDate,
+					user_no as userNo,
+					COMMENT_CONTENT as title,
+					'commnet' as type,
+					COMMENT_NO as dataNo
+			from FINAL_COMMENT
+			UNION ALL
+			select video_create_date,
+					user_no,
+					video_contents,
+					'video',
+					video_no
+			from FINAL_VIDEO
+			UNION ALL
+			SELECT subcomment_create_date,
+					user_no,
+					subcomment_content,
+					'subcommnet',
+					subcomment_no
+			from FINAL_SUBCOMMENT
+			order by 1 desc) A, FINAL_USER B
+			where A.userNo = B.USER_NO)
+			where no1 = 1
+  		</select>
+  			
+</mapper>

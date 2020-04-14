@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.CmtEmotionDao">
+
+	
+	<!-- 댓글좋아요 등록 -->
+	<insert id="insertCmtEmotion" parameterType="CmtEmotion">
+		insert into final_cmt_emotion
+			(comment_no, user_no, comment_emotion)
+		values
+			(#{commentNo}, #{userNo}, #{emotion})
+	</insert>
+	
+	<!-- 서브댓글좋아요 등록 -->
+	<insert id="insertSubCmtEmotion" parameterType="SubCmtEmotion">
+		insert into final_subcmt_emotion
+			(subcomment_no, user_no, subcomment_emotion)
+		values
+			(#{subcommentNo}, #{userNo}, #{subEmotion})
+	</insert>
+	
+	<!-- 댓글좋아요 업데이트 -->
+	<update id="updateCmtEmotion" parameterType="CmtEmotion">
+		update final_cmt_emotion
+			set comment_emotion = #{emotion}
+  	 	where comment_no=#{commentNo} 
+	</update>
+	
+	<!-- 서브댓글좋아요 업데이트 -->
+	<update id="updateSubCmtEmotion" parameterType="SubCmtEmotion">
+		update final_subcmt_emotion
+			set subcomment_emotion = #{subEmotion}
+  	 	where subcomment_no=#{subcommentNo} 
+	</update>
+	
+	<!-- 댓글좋아요 찾기 -->
+	<select id="getCmtEmotionByUserNo" parameterType="map" resultType="CmtEmotion">
+		select
+			comment_no			commentNo,
+			user_no				userNo,
+			comment_emotion		emotion
+		from
+			final_cmt_emotion
+		where
+			user_no = #{userNo}
+			and comment_no = #{commentNo}
+	</select>
+	
+	<!-- 서브댓글좋아요 찾기 -->
+	<select id="getSubCmtEmotionByUserNo" parameterType="map" resultType="SubCmtEmotion">
+		select
+			subcomment_no			subcommentNo,
+			user_no					userNo,
+			subcomment_emotion		subEmotion
+		from
+			final_subcmt_emotion
+		where
+			user_no = #{userNo}
+			and subcomment_no = #{subcommentNo}
+	</select>
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.VideoEmotionDao">
+
+	<insert id="insertVideoEmotion" parameterType="VideoEmotion">
+		insert into final_video_emotion
+			(video_no, user_no, video_emotion)
+		values
+			(#{videoNo}, #{userNo}, #{videoEmtion})
+	</insert>
+
+	<select id="countVideoEmotionByUserNo" parameterType="int" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			FINAL_VIDEO_EMOTION
+		WHERE	
+			user_no = #{value}
+		and
+			video_emotion = 'Y'
+	</select>
+	
+	<select id="getEmotionVideoByUserNo" parameterType="int" resultType="GoodListByUserNo">
+		SELECT
+			a.USER_NO				userNo,
+			a.VIDEO_EMOTION			videoEmotion,
+			b.VIDEO_NO				videoNo,
+			b.CATE_NO				cateNo,
+			b.VIDEO_TITLE			videoTitle,
+			b.VIDEO_VIEWS			videoviews,
+			b.VIDEO_CREATE_DATE		videoCreateDate,
+			b.VIDEO_PUBLIC			videoPublic,
+			b.VIDEO_GRADE			videoGrade,
+			b.VIDEO_TAG				videoTag,
+			b.VIDEO_CONTENTS		videoContent,
+			c.VIDEO_PATH_NO			videoPathNo,
+			c.VIDEO_PATH			videoPath,
+			c.VIDEO_IMAGE			videoImage,
+			d.CHANNEL_NO			channelNo,
+			d.channel_title			channelTitle,
+			d.channel_content		channelContent
+		FROM
+			FINAL_VIDEO_EMOTION a, FINAL_VIDEO b, FINAL_VIDEO_PATH_INFO c, final_channel d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			b.VIDEO_NO = c.VIDEO_NO
+		and
+			b.channel_no = d.channel_no
+		AND
+			a.VIDEO_EMOTION = 'Y'
+		AND
+			a.USER_NO = #{value}
+	</select>
+	
+	<update id="updateVideoEmotion" parameterType="VideoEmotion">
+		update
+			final_video_emotion
+		set
+			video_emotion = #{videoEmtion}
+		where
+			user_no = #{userNo}
+		and
+			video_no = #{videoNo}
+			
+	</update>
+	
+	<delete id="delVideoEmotionByVideoNo" parameterType="int">
+		DELETE
+			final_VIDEO_emotion
+		WHERE
+			video_no = #{value}
+	</delete>
+	
+	<select id="getVideoEmotionByUserNo" parameterType="map" resultType="VideoEmotion">
+		select
+			video_no			videoNo,
+			user_no				userNo,
+			video_emotion		videoEmtion
+		from
+			final_video_emotion
+		where
+			user_no = #{userNo}
+			and video_no = #{videoNo}
+	</select>
+  	
+</mapper>

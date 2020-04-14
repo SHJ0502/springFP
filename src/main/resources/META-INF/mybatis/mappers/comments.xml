@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.CommentDao">
+
+	<!-- 댓글 수정 -->
+	<update id="updateComment" parameterType="Comment">
+		update
+   			final_comment
+   		set
+			comment_content	= #{content},
+			like_amount	= #{likeAmount}
+   		where
+   			comment_no = #{no}
+	</update> 
+
+	<!-- 댓글 추가 -->
+	<insert id="insertComment" parameterType="Comment">
+		insert into final_comment
+			(comment_no, video_no, user_no, comment_content, comment_create_date)
+		values
+			(final_comment_seq.nextval, #{videoNo}, #{userNo}, #{content}, sysdate)
+	</insert>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="deleteComment" parameterType="int">
+		delete from
+			final_comment
+		where
+			comment_no = #{value}
+	</delete>
+	
+	<!-- 전체댓글 불러오기 -->
+	<select id="getAllComment" resultType="Comment">
+		select
+			comment_no			no,
+			video_no			videoNo,
+			user_no				userNo,
+			comment_content		content,
+			comment_create_date	createDate,
+			like_amount			likeAmount
+		from
+			final_comment
+		order by
+			comment_create_date desc
+	</select>
+	
+	<!-- 비디오번호에 해당하는 댓글 불러오기 -->
+	<select id="getCommentByVideoNo" parameterType="int" resultType="Comment">
+		select
+			A.comment_no			no,
+			A.video_no				videoNo,
+			A.user_no				userNo,
+			A.comment_content		content,
+			A.comment_create_date	createDate,
+			(select count(*) from final_subcomment X where X.comment_no = A.comment_no) cnt,
+			B.user_image_path 		imagePath,
+			B.user_name				userName,
+			A.like_amount			likeAmount
+		from
+			final_comment A, final_user B
+		where
+			A.video_no = #{value}
+			and A.user_no = B.user_no
+		order by
+			A.comment_create_date desc
+	</select>
+	
+	<!-- 해당유저번호댓글 빼고 불러오기 -->
+	<select id="getAllCommentRemoveByUserNo" parameterType="map" resultType="Comment">
+		select
+			A.comment_no			no,
+			A.video_no			videoNo,
+			A.user_no				userNo,
+			A.comment_content		content,
+			A.comment_create_date	createDate,
+			(select count(*) from final_subcomment X where X.comment_no = A.comment_no) cnt,
+			B.user_image_path 		imagePath,
+			B.user_name				userName,
+			A.like_amount			likeAmount
+		from
+			final_comment A, final_user B
+		where
+			A.user_no not in #{userNo}
+			and A.user_no = B.user_no
+			and A.video_no = #{videoNo}
+		order by
+			A.comment_create_date desc
+	</select>
+	
+	<!-- 해당유저번호 댓글 불러오기 -->
+	<select id="getCommentByUserNo" parameterType="map" resultType="Comment">
+		select
+			A.comment_no			no,
+			A.video_no			videoNo,
+			A.user_no				userNo,
+			A.comment_content		content,
+			A.comment_create_date	createDate,
+			(select count(*) from final_subcomment X where X.comment_no = A.comment_no) cnt,
+			B.user_image_path 		imagePath,
+			B.user_name				userName,
+			A.like_amount			likeAmount
+		from
+			final_comment A, final_user B
+		where
+			A.user_no = #{userNo}
+			and A.video_no = #{videoNo}
+			and A.user_no = B.user_no
+		order by
+			A.comment_create_date desc
+	</select>
+	
+	<!-- 댓글번호로 댓글 조회하기 -->
+	<select id="getCommentByCommentNo" parameterType="int" resultType="Comment">
+		select
+			comment_no			no,
+			video_no			videoNo,
+			user_no				userNo,
+			comment_content		content,
+			comment_create_date	createDate,
+			like_amount			likeAmount
+		from
+			final_comment
+		where
+			comment_no = #{value}
+		order by
+			comment_create_date desc
+	</select>
+	
+	<!-- 서브댓글 추가 -->
+	<insert id="insertSubComment" parameterType="SubComment">
+		insert into final_subcomment
+			(subcomment_no, comment_no, user_no, subcomment_content, subcomment_create_date)
+		values
+			(final_subcomment_seq.nextval, #{commentNo}, #{userNo}, #{content}, sysdate)
+	</insert>
+	
+	<select id="getSubCommentByCommentNo" parameterType="int" resultType="SubComment">
+		select
+			A.subcomment_no					no,
+			A.comment_no					commentNo,
+			A.user_no						userNo,
+			A.subcomment_content			content,
+			A.subcomment_create_date		createDate,
+			B.user_image_path 				imagePath,
+			B.user_name						userName,
+			A.like_amount					likeAmount
+		from
+			final_subcomment A, final_user B
+		where
+			comment_no = #{value}
+			and A.user_no = B.user_no
+		order by
+			subcomment_create_date desc
+	</select>
+	
+	<select id="getSubCommentBySubCommentNo" parameterType="int" resultType="SubComment">
+		select
+			A.subcomment_no					no,
+			A.comment_no					commentNo,
+			A.user_no						userNo,
+			A.subcomment_content			content,
+			A.subcomment_create_date		createDate,
+			B.user_image_path 				imagePath,
+			B.user_name						userName,
+			A.like_amount					likeAmount
+		from
+			final_subcomment A, final_user B
+		where
+			subcomment_no = #{value}
+			and A.user_no = B.user_no
+	</select>
+	
+	<!-- 서브댓글 삭제 -->
+	<delete id="deleteSubComment" parameterType="int">
+		delete from
+			final_subcomment
+		where
+			subcomment_no = #{value}
+	</delete>
+	
+	<!-- 서브댓글 수정 -->
+	<update id="updateSubComment" parameterType="SubComment">
+		update
+   			final_subcomment
+   		set
+			subcomment_content	= #{content},
+			like_amount	= #{likeAmount}
+   		where
+   			subcomment_no = #{no}
+	</update>
+	
+	
+	
+</mapper>

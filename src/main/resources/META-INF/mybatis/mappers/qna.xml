@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.QnaDao">
+  	
+  	<insert id="insertQna" parameterType="qna">
+  		insert into final_qnaboard
+  		(qna_no, user_no, field, field2, qna_create_date)
+  		VALUES
+  		(final_qna_seq.nextval, #{userNo}, #{title}, #{text}, sysdate)
+  	</insert>
+  	
+  	<select id="getAllMail" resultType="qna">
+  		select
+			qna_no no,
+			user_no userNo,
+			field title,
+			field2 text,
+			qna_create_date createDate,
+			qna_is_answered isanswered
+		from FINAL_QNABOARD
+		order by qna_create_date desc
+  	</select>
+  	
+  	<select id="getMailByNo" parameterType="int" resultType="qna">
+  		select
+			qna_no no,
+			user_no userNo,
+			field title,
+			field2 text,
+			qna_create_date createDate,
+			qna_is_answered isanswered
+		from FINAL_QNABOARD
+		where
+			qna_no = #{value}
+  	</select>
+  	
+  	<select id="getFourQna" resultType="qna">
+  		select
+			qna_no no,
+			user_no userNo,
+			field title,
+			field2 text,
+			qna_create_date createDate,
+			qna_is_answered isanswered,
+			id userId,
+			image image
+		from (select
+		A.*,B.user_id id,B.user_image_path image,
+			ROW_NUMBER() over (order by qna_create_date desc) rn
+			from FINAL_QNABOARD A, FINAL_USER B
+			where
+				A.USER_NO = B.USER_NO)
+		where rn &lt;=4
+  	</select>
+  	
+  	<update id="updateReadMail" parameterType="int">
+  		update final_qnaboard
+  			set
+  		QNA_IS_ANSWERED = 'Y'
+  		where
+  		 QNA_NO = #{value}
+  	</update>
+</mapper>

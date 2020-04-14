@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.VideoDao">
+
+	<insert id="insertVideo" parameterType="Video">
+		insert into final_video
+			(VIDEO_NO, USER_NO, CATE_NO, CHANNEL_NO, VIDEO_TITLE, VIDEO_VIEWS, VIDEO_CREATE_DATE, VIDEO_PUBLIC, VIDEO_GRADE, VIDEO_TAG, VIDEO_CONTENTS)
+		values
+			(#{no}, #{userNo}, #{cateNo}, #{channelNo}, #{title}, 0, sysdate, #{status}, #{grade}, #{tag}, #{contents})
+	</insert>
+	
+	<insert id="insertPlayList" parameterType="playlistdto">
+		insert into final_playlist_video
+			(playlist_no, video_no)
+		values
+			(#{playlistNo}, #{videoNo})
+	</insert>
+	
+	<insert id="insertViews" parameterType="Views">
+		insert into final_views
+			(video_no)
+		values
+			(#{videoNo})
+	</insert>
+	
+	
+	<select id="getVideoNo" resultType="int">
+		select 
+			FINAL_VIDEO_SEQ.nextval
+		from 
+			dual
+	</select>
+	<select id="getVideoByNo" parameterType="int" resultType="Video">
+		select
+			video_no			no,
+			user_no				userNo,
+			cate_no				cateNo,
+			channel_no			channelNo,
+			video_title			title,
+			video_create_date	createDate,
+			video_public		status,
+			video_views			views,
+			video_grade			grade,
+			video_tag			tag,
+			video_contents		contents,
+			like_amount			likeAmount
+		from
+			final_video
+		where
+			video_no = #{value}		
+	</select>
+	
+	<select id="AllVideoCateMusic" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail,
+			c.CHANNEL_TITLE             channelTitle
+			
+		from
+			final_video a, final_video_path_info b, FINAL_CHANNEL c
+		where
+			a.video_no = b.video_no
+		and
+			a.CHANNEL_NO = c.CHANNEL_NO
+		and
+			a.cate_no = 1
+		order by
+			a.video_create_date desc
+	</select>
+	
+	<select id="AllVideoCateSport" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail,
+			c.CHANNEL_TITLE             channelTitle
+			
+		from
+			final_video a, final_video_path_info b, FINAL_CHANNEL c
+		where
+			a.video_no = b.video_no
+		and
+			a.CHANNEL_NO = c.CHANNEL_NO
+		and
+			a.cate_no = 2
+		order by
+			a.video_create_date desc
+	</select>
+	
+	<select id="AllVideoCateGame" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail,
+			c.CHANNEL_TITLE             channelTitle
+			
+		from
+			final_video a, final_video_path_info b, FINAL_CHANNEL c
+		where
+			a.video_no = b.video_no
+		and
+			a.CHANNEL_NO = c.CHANNEL_NO
+		and
+			a.cate_no = 3
+		order by
+			a.video_create_date desc
+	</select>
+	<select id="AllVideoCateMovie" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail,
+			c.CHANNEL_TITLE             channelTitle
+			
+		from
+			final_video a, final_video_path_info b, FINAL_CHANNEL c
+		where
+			a.video_no = b.video_no
+		and
+			a.CHANNEL_NO = c.CHANNEL_NO
+		and
+			a.cate_no = 4
+		order by
+			a.video_create_date desc
+	</select>
+	
+	<select id="getVideoByKeyword" parameterType="string" resultType="VideoThumnailDto">
+	select 
+		a.VIDEO_NO				videoNo,
+		a.USER_NO				userNo,
+		a.CATE_NO				cateNo,
+		a.CHANNEL_NO			channelNo,
+		a.VIDEO_TITLE			title,
+		a.VIDEO_VIEWS			views,
+		a.VIDEO_CREATE_DATE		createDate,
+		a.VIDEO_PUBLIC			videoPublic,
+		a.VIDEO_GRADE			grade,
+		a.VIDEO_TAG				tag,
+		a.VIDEO_CONTENTS		content,
+		b.VIDEO_PATH_NO			pathNo,
+		b.VIDEO_PATH			path,
+		b.VIDEO_IMAGE			image,
+		c.channel_title			channelTitle
+	from 
+		final_video a, FINAL_VIDEO_PATH_INFO b, final_channel c
+	where 
+		a.video_no = b.video_no
+	and
+		a.channel_no = c.channel_no
+	and
+		(VIDEO_TITLE like '%' || #{value} || '%' or VIDEO_TAG like '%' || #{value} || '%')
+	</select>
+	
+	<select id="getVideosByUserNo" parameterType="int" resultType="Video">
+		select
+			video_no			no,
+			user_no				userNo,
+			cate_no				cateNo,
+			channel_no			channelNo,
+			video_title			title,
+			video_create_date	createDate,
+			video_public		status,
+			video_grade			grade,
+			video_tag			tag,
+			video_views			views,
+			video_contents		contents
+		from
+			final_video
+		where
+			user_no = #{no}		
+	</select>
+	
+	<select id="countVideoByUserNo" parameterType="int" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			FINAL_VIDEO
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getAllVideoList" resultType="Video">
+		select
+			video_no			no,
+			user_no				userNo,
+			cate_no				cateNo,
+			channel_no			channelNo,
+			video_title			title,
+			video_create_date	createDate,
+			video_public		status,
+			video_grade			grade,
+			video_contents		contents,
+			video_tag			tag
+		from
+			final_video
+		order by video_create_date desc
+	</select>
+	
+	<select id="getVideoListByCateNo" parameterType="int" resultType="Video">
+		select
+			video_no			no,
+			user_no				userNo,
+			cate_no				cateNo,
+			channel_no			channelNo,
+			video_title			title,
+			video_create_date	createDate,
+			video_public		status,
+			video_grade			grade,
+			video_tag			tag
+		from
+			final_video
+		where
+			cate_no = #{value}		
+	</select>
+	
+	<select id="getVideoVideoPathByUserNo" parameterType="int" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail
+		from
+			final_video a, final_video_path_info b
+		where
+			a.video_no = b.video_no
+		and
+			a.user_no = #{no}
+		order by
+			a.video_create_date desc
+	</select>
+	
+	<select id="getVideoVideoPathByVideoNo" parameterType="int" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			c.channel_title				channelTitle,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail
+		from
+			final_video a, final_video_path_info b, final_channel c
+		where
+			a.video_no = b.video_no
+		and 
+			a.channel_no = c.channel_no
+		and
+			a.video_no = #{no}
+		order by
+			a.video_create_date desc
+	</select>
+	
+	<select id="getAllVideoVideoPathDto" resultType="VideoVideoPathDto">
+		select
+			a.video_no					videoNo,
+			a.user_no					userNo,
+			a.cate_no					cateNo,
+			a.channel_no				channelNo,
+			a.video_title				videoTitle,
+			a.video_views				videoViews,
+			a.video_create_date			videoCreateDate,
+			a.video_public				videoPublic,
+			a.video_grade				videoGrade,
+			a.video_tag					videoTag,
+			a.video_contents			videoContents,
+			b.video_path				videoPath,
+			b.video_image				videoThumbnail
+		from
+			final_video a, final_video_path_info b
+		where
+			a.video_no = b.video_no
+	</select>
+	
+	<insert id="insertWatchLate" parameterType="videowatchlateDto">
+		insert into final_watch_late
+			(watch_late_no, user_no, video_no, after_date)
+		values
+			(final_watch_late_seq.nextval, #{userNo}, #{videoNo}, sysdate)
+	</insert>
+	
+	<select id="getHotThumbnails" parameterType="int" resultType="HomeThumbnaildto">
+		select
+			a.video_path_no			no,
+			a.video_no				videoNo,
+			a.video_path			path,
+			a.video_image			image,
+			d.user_no				userNo,
+			b.cate_no				cateNo,
+			c.channel_no			channelNo,
+			b.video_title			title,
+			b.video_create_date		createDate,
+			b.video_public			videoPublic,
+			b.video_grade			grade,
+			b.video_tag				tag,
+			b.video_views			views,
+			c.channel_title			channelTitle,
+			c.channel_tag			channelTag,
+			c.channel_art_path		artPath,
+			c.channel_content		content,
+			d.user_name				userName,
+			d.user_image_path		userImagePath		
+		from
+			final_video_path_info a, final_video b, final_channel c, final_user d
+		where
+			a.video_no = b.video_no
+		and
+			b.channel_no = c.channel_no
+		and 
+			c.user_no = d.user_no
+		and
+			7 >= sysdate - b.video_create_date 
+		<if test="value != 0">
+		and
+			b.cate_no = #{value}
+		</if>
+		order by
+			b.video_views desc
+	</select>
+	
+	<select id="getTodayUpload" parameterType="int" resultType="Thumbnails">
+		SELECT
+			a.VIDEO_NO					videoNo,
+			a.CATE_NO					cateNo,
+			a.VIDEO_TITLE				videoTitle,
+			a.VIDEO_VIEWS				videoView,
+			a.VIDEO_CREATE_DATE			videoCreateDate,
+			a.VIDEO_PUBLIC				videoPublic,
+			a.VIDEO_GRADE				videoGrade,
+			a.VIDEO_TAG					videoTag,
+			a.VIDEO_CONTENTS			videoContent,
+			b.VIDEO_PATH_NO				videoPathNo,
+			b.VIDEO_PATH				videoPath,
+			b.VIDEO_IMAGE				videoThumbnail,
+			c.CHANNEL_NO				channelNo,
+			c.CHANNEL_TITLE				channelTitle,
+			c.CHANNEL_CONTENT			channelContent,
+			d.user_no					userNo,
+			d.user_name					userName,
+			d.user_image_path			userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_CHANNEL c, FINAL_USER d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			a.CHANNEL_NO = c.CHANNEL_NO
+		AND
+			a.USER_NO = d.USER_NO
+		and
+			1 > sysdate - a.video_create_date
+		and
+			c.CHANNEL_NO in (SELECT
+								CHANNEL_NO
+							FROM
+								FINAL_SUBSCRIBE
+							WHERE
+								USER_NO = #{value}
+							)
+		order by
+			a.video_views desc
+	</select>
+	
+	<select id="getYesterdayUpload" parameterType="int" resultType="Thumbnails">
+		SELECT
+			a.VIDEO_NO					videoNo,
+			a.CATE_NO					cateNo,
+			a.VIDEO_TITLE				videoTitle,
+			a.VIDEO_VIEWS				videoView,
+			a.VIDEO_CREATE_DATE			videoCreateDate,
+			a.VIDEO_PUBLIC				videoPublic,
+			a.VIDEO_GRADE				videoGrade,
+			a.VIDEO_TAG					videoTag,
+			a.VIDEO_CONTENTS			videoContent,
+			b.VIDEO_PATH_NO				videoPathNo,
+			b.VIDEO_PATH				videoPath,
+			b.VIDEO_IMAGE				videoThumbnail,
+			c.CHANNEL_NO				channelNo,
+			c.CHANNEL_TITLE				channelTitle,
+			c.CHANNEL_CONTENT			channelContent,
+			d.user_no					userNo,
+			d.user_name					userName,
+			d.user_image_path			userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_CHANNEL c, FINAL_USER d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			a.CHANNEL_NO = c.CHANNEL_NO
+		AND
+			a.USER_NO = d.USER_NO
+		and
+			sysdate - a.video_create_date >= 1
+		and
+			2 > sysdate - a.video_create_date
+		and
+			c.CHANNEL_NO in (SELECT
+								CHANNEL_NO
+							FROM
+								FINAL_SUBSCRIBE
+							WHERE
+								USER_NO = #{value}
+							)
+		order by
+			a.video_views desc
+	</select>
+	
+	<select id="getweekUpload" parameterType="int" resultType="Thumbnails">
+		SELECT
+			a.VIDEO_NO					videoNo,
+			a.CATE_NO					cateNo,
+			a.VIDEO_TITLE				videoTitle,
+			a.VIDEO_VIEWS				videoView,
+			a.VIDEO_CREATE_DATE			videoCreateDate,
+			a.VIDEO_PUBLIC				videoPublic,
+			a.VIDEO_GRADE				videoGrade,
+			a.VIDEO_TAG					videoTag,
+			a.VIDEO_CONTENTS			videoContent,
+			b.VIDEO_PATH_NO				videoPathNo,
+			b.VIDEO_PATH				videoPath,
+			b.VIDEO_IMAGE				videoThumbnail,
+			c.CHANNEL_NO				channelNo,
+			c.CHANNEL_TITLE				channelTitle,
+			c.CHANNEL_CONTENT			channelContent,
+			d.user_no					userNo,
+			d.user_name					userName,
+			d.user_image_path			userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_CHANNEL c, FINAL_USER d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			a.CHANNEL_NO = c.CHANNEL_NO
+		AND
+			a.USER_NO = d.USER_NO
+		and
+			sysdate - a.video_create_date >= 2
+		and
+			7 > sysdate - a.video_create_date
+		and
+			c.CHANNEL_NO in (SELECT
+								CHANNEL_NO
+							FROM
+								FINAL_SUBSCRIBE
+							WHERE
+								USER_NO = #{value}
+							)
+		order by
+			a.video_views desc
+	</select>
+	
+	<select id="getMonthUpload" parameterType="int" resultType="Thumbnails">
+		SELECT
+			a.VIDEO_NO					videoNo,
+			a.CATE_NO					cateNo,
+			a.VIDEO_TITLE				videoTitle,
+			a.VIDEO_VIEWS				videoView,
+			a.VIDEO_CREATE_DATE			videoCreateDate,
+			a.VIDEO_PUBLIC				videoPublic,
+			a.VIDEO_GRADE				videoGrade,
+			a.VIDEO_TAG					videoTag,
+			a.VIDEO_CONTENTS			videoContent,
+			b.VIDEO_PATH_NO				videoPathNo,
+			b.VIDEO_PATH				videoPath,
+			b.VIDEO_IMAGE				videoThumbnail,
+			c.CHANNEL_NO				channelNo,
+			c.CHANNEL_TITLE				channelTitle,
+			c.CHANNEL_CONTENT			channelContent,
+			d.user_no					userNo,
+			d.user_name					userName,
+			d.user_image_path			userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_CHANNEL c, FINAL_USER d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			a.CHANNEL_NO = c.CHANNEL_NO
+		AND
+			a.USER_NO = d.USER_NO
+		and
+			sysdate - a.video_create_date >= 7
+		and
+			30 > sysdate - a.video_create_date
+		and
+			c.CHANNEL_NO in (SELECT
+								CHANNEL_NO
+							FROM
+								FINAL_SUBSCRIBE
+							WHERE
+								USER_NO = #{value}
+							)
+		order by
+			a.video_views desc
+	</select>
+	
+	
+	<update id="updateVideo" parameterType="Video">
+		update
+			final_video
+		set
+			VIDEO_TITLE			= #{title},
+			VIDEO_VIEWS			= #{views},
+			VIDEO_CREATE_DATE	= #{createDate},
+			VIDEO_PUBLIC		= #{status},
+			VIDEO_GRADE			= #{grade},
+			VIDEO_CONTENTS		= #{contents},
+			like_amount			= #{likeAmount}
+		where
+			VIDEO_NO = #{no}
+	</update>
+	
+	<delete id="deleteVideo" parameterType="int">
+		delete from
+			final_video
+		where
+			VIDEO_NO = #{no}
+	</delete>
+	
+	<select id="getVideoRemoveByNo" parameterType="int" resultType="VideoVideoPathDto">
+      select
+       	a.video_no					videoNo,
+		a.user_no					userNo,
+		a.cate_no					cateNo,
+		a.channel_no				channelNo,
+		c.channel_title				channelTitle,
+		a.video_title				videoTitle,
+		a.video_views				videoViews,
+		a.video_create_date			videoCreateDate,
+		a.video_public				videoPublic,
+		a.video_grade				videoGrade,
+		a.video_tag					videoTag,
+		a.video_contents			videoContents,
+		b.video_path				videoPath,
+		b.video_image				videoThumbnail
+     from
+		final_video a, final_video_path_info b, final_channel c
+	where
+       a.video_no = b.video_no
+       and 
+       		a.channel_no = c.channel_no
+        and a.video_no not in #{value}
+     </select>
+	
+	<select id="getVideoListBySubject" parameterType="String" resultType="Video">
+		select
+			video_no			no,
+			user_no				userNo,
+			cate_no				cateNo,
+			channel_no			channelNo,
+			video_title			title,
+			video_create_date	createDate,
+			video_public		status,
+			video_grade			grade,
+			video_contents		contents,
+			video_tag			tag
+		from
+			final_video
+		where
+			video_title like '%${value}%'
+		order by video_create_date desc
+	</select>
+</mapper>

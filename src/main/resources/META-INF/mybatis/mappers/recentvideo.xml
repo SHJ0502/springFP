@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.RecentVideoDao">
+
+	<insert id="insertRecentVideo" parameterType="RecentVideo">
+		insert into final_recent_video
+			(user_no, video_no)
+		values
+			( #{userNo}, #{videoNo} )
+	</insert>
+
+	<select id="getRecentDtoByUserNo" parameterType="int" resultType="RecentListDto">
+		SELECT
+			a.VIDEO_NO				videoNo,
+			a.CATE_NO				cateNo,
+			a.VIDEO_TITLE			videoTitle,
+			a.VIDEO_VIEWS			videoViews,
+			a.VIDEO_CREATE_DATE		videoCreateDate,
+			a.VIDEO_PUBLIC			videoPublic,
+			a.VIDEO_GRADE			videoGrade,
+			a.VIDEO_TAG				videoTag,
+			a.VIDEO_CONTENTS		videoContents,
+			b.VIDEO_PATH_NO			videoPathNo,
+			b.VIDEO_PATH			videoPath,
+			b.VIDEO_IMAGE			videoImage,
+			c.RECENT_DATE			recentDate,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_ID				userId,
+			e.USER_PASSWORD			userPassword,
+			e.USER_NAME				userName,
+			e.USER_EMAIL			userEmail,
+			e.USER_CREATE_DATE		userCreateDate,
+			e.USER_BIRTHDAY			userBirthDay,
+			e.USER_IMAGE_PATH		userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_RECENT_VIDEO c, FINAL_CHANNEL d, FINAL_USER e
+		where
+			c.USER_NO = e.USER_NO
+		AND
+			c.VIDEO_NO = a.VIDEO_NO
+		AND
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			d.CHANNEL_NO = a.CHANNEL_NO
+		AND
+			c.USER_NO = #{value}
+		AND
+			c.RECENT_DATE > SYSDATE - 30
+	</select>
+	
+	<select id="getRecentDtoByUserNoToday" parameterType="int" resultType="RecentListDto">
+		SELECT
+			a.VIDEO_NO				videoNo,
+			a.CATE_NO				cateNo,
+			a.VIDEO_TITLE			videoTitle,
+			a.VIDEO_VIEWS			videoViews,
+			a.VIDEO_CREATE_DATE		videoCreateDate,
+			a.VIDEO_PUBLIC			videoPublic,
+			a.VIDEO_GRADE			videoGrade,
+			a.VIDEO_TAG				videoTag,
+			a.VIDEO_CONTENTS		videoContents,
+			b.VIDEO_PATH_NO			videoPathNo,
+			b.VIDEO_PATH			videoPath,
+			b.VIDEO_IMAGE			videoImage,
+			c.RECENT_DATE			recentDate,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_ID				userId,
+			e.USER_PASSWORD			userPassword,
+			e.USER_NAME				userName,
+			e.USER_EMAIL			userEmail,
+			e.USER_CREATE_DATE		userCreateDate,
+			e.USER_BIRTHDAY			userBirthDay,
+			e.USER_IMAGE_PATH		userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_RECENT_VIDEO c, FINAL_CHANNEL d, FINAL_USER e
+		where
+			c.USER_NO = e.USER_NO
+		AND
+			c.VIDEO_NO = a.VIDEO_NO
+		AND
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			d.CHANNEL_NO = a.CHANNEL_NO
+		AND
+			c.USER_NO = #{value}
+		AND
+			c.RECENT_DATE > sysdate -1
+		AND
+			to_char(c.RECENT_DATE, 'yyyy-MM-dd') = TO_CHAR(SYSDATE, 'yyyy-MM-dd')
+	</select>
+	
+	<select id="getRecentDtoByUserNoYesterday" parameterType="int" resultType="RecentListDto">
+		SELECT
+			a.VIDEO_NO				videoNo,
+			a.CATE_NO				cateNo,
+			a.VIDEO_TITLE			videoTitle,
+			a.VIDEO_VIEWS			videoViews,
+			a.VIDEO_CREATE_DATE		videoCreateDate,
+			a.VIDEO_PUBLIC			videoPublic,
+			a.VIDEO_GRADE			videoGrade,
+			a.VIDEO_TAG				videoTag,
+			a.VIDEO_CONTENTS		videoContents,
+			b.VIDEO_PATH_NO			videoPathNo,
+			b.VIDEO_PATH			videoPath,
+			b.VIDEO_IMAGE			videoImage,
+			c.RECENT_DATE			recentDate,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_ID				userId,
+			e.USER_PASSWORD			userPassword,
+			e.USER_NAME				userName,
+			e.USER_EMAIL			userEmail,
+			e.USER_CREATE_DATE		userCreateDate,
+			e.USER_BIRTHDAY			userBirthDay,
+			e.USER_IMAGE_PATH		userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_RECENT_VIDEO c, FINAL_CHANNEL d, FINAL_USER e
+		where
+			c.USER_NO = e.USER_NO
+		AND
+			c.VIDEO_NO = a.VIDEO_NO
+		AND
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			d.CHANNEL_NO = a.CHANNEL_NO
+		AND
+			c.USER_NO = #{value}
+		AND
+			to_char(c.RECENT_DATE, 'yyyy-MM-dd') = TO_CHAR(SYSDATE -1, 'yyyy-MM-dd')
+	</select>
+	
+	<select id="getRecentDtoByUserNoWeek" parameterType="int" resultType="RecentListDto">
+		SELECT
+			a.VIDEO_NO				videoNo,
+			a.CATE_NO				cateNo,
+			a.VIDEO_TITLE			videoTitle,
+			a.VIDEO_VIEWS			videoViews,
+			a.VIDEO_CREATE_DATE		videoCreateDate,
+			a.VIDEO_PUBLIC			videoPublic,
+			a.VIDEO_GRADE			videoGrade,
+			a.VIDEO_TAG				videoTag,
+			a.VIDEO_CONTENTS		videoContents,
+			b.VIDEO_PATH_NO			videoPathNo,
+			b.VIDEO_PATH			videoPath,
+			b.VIDEO_IMAGE			videoImage,
+			c.RECENT_DATE			recentDate,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_ID				userId,
+			e.USER_PASSWORD			userPassword,
+			e.USER_NAME				userName,
+			e.USER_EMAIL			userEmail,
+			e.USER_CREATE_DATE		userCreateDate,
+			e.USER_BIRTHDAY			userBirthDay,
+			e.USER_IMAGE_PATH		userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_RECENT_VIDEO c, FINAL_CHANNEL d, FINAL_USER e
+		where
+			c.USER_NO = e.USER_NO
+		AND
+			c.VIDEO_NO = a.VIDEO_NO
+		AND
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			d.CHANNEL_NO = a.CHANNEL_NO
+		AND
+			c.USER_NO = #{value}
+		and
+			c.RECENT_DATE > sysdate - 7	
+		AND
+			to_char(c.RECENT_DATE, 'yyyy-MM-dd') > TO_CHAR(SYSDATE - 7, 'yyyy-MM-dd')
+		AND
+			to_char(SYSDATE	-1, 'yyyy-MM-dd') >= to_char(c.RECENT_DATE, 'yyyy-MM-dd')
+	</select>
+	
+	<select id="getRecentDtoByUserNoMonth" parameterType="int" resultType="RecentListDto">
+		SELECT
+			a.VIDEO_NO				videoNo,
+			a.CATE_NO				cateNo,
+			a.VIDEO_TITLE			videoTitle,
+			a.VIDEO_VIEWS			videoViews,
+			a.VIDEO_CREATE_DATE		videoCreateDate,
+			a.VIDEO_PUBLIC			videoPublic,
+			a.VIDEO_GRADE			videoGrade,
+			a.VIDEO_TAG				videoTag,
+			a.VIDEO_CONTENTS		videoContents,
+			b.VIDEO_PATH_NO			videoPathNo,
+			b.VIDEO_PATH			videoPath,
+			b.VIDEO_IMAGE			videoImage,
+			c.RECENT_DATE			recentDate,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_ID				userId,
+			e.USER_PASSWORD			userPassword,
+			e.USER_NAME				userName,
+			e.USER_EMAIL			userEmail,
+			e.USER_CREATE_DATE		userCreateDate,
+			e.USER_BIRTHDAY			userBirthDay,
+			e.USER_IMAGE_PATH		userImagePath
+		FROM
+			FINAL_VIDEO a, FINAL_VIDEO_PATH_INFO b, FINAL_RECENT_VIDEO c, FINAL_CHANNEL d, FINAL_USER e
+		where
+			c.USER_NO = e.USER_NO
+		AND
+			c.VIDEO_NO = a.VIDEO_NO
+		AND
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			d.CHANNEL_NO = a.CHANNEL_NO
+		AND
+			c.USER_NO = #{userno}
+		and
+			c.RECENT_DATE > sysdate - 30	
+		AND
+			to_char(c.RECENT_DATE, 'yyyy-MM-dd') > TO_CHAR(SYSDATE - 30, 'yyyy-MM-dd')
+		AND
+			to_char(SYSDATE	-7, 'yyyy-MM-dd') >= to_char(c.RECENT_DATE, 'yyyy-MM-dd')
+	</select>
+	
+	<delete id="delRecentVideo" parameterType="map">
+		DELETE
+			FROM FINAL_RECENT_VIDEO
+		WHERE
+			USER_NO = #{userno}
+		AND
+			VIDEO_NO = #{videono}
+	</delete>
+  	
+</mapper>

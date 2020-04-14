@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.PlayListDao">
+	<insert id="addPlayList" parameterType="playlist">
+		insert into final_playlist
+			(playlist_no, user_no, playlist_title, playlist_subtitle)
+		values
+			(#{no}, #{userNo}, #{title}, #{subTitle})
+	</insert>
+
+	<insert id="addPlayListVideo" parameterType="playlistdto">
+		insert into final_playlist_video
+			(playlist_no, video_no)
+		values
+			(#{playlistNo}, #{videoNo})
+	</insert>
+	
+	<delete id="removePlayListVideo" parameterType="playlistdto">
+		delete from final_playlist_video
+		where
+			playlist_no = ${playlistNo}
+			and video_no = ${videoNo}
+	</delete>
+	
+	<delete id="delPlvByPlv" parameterType="PlayListVideo">
+		delete from
+			final_playlist_video
+		where
+			playlist_no = ${playlistNo}
+		and 
+			video_no = ${videoNo}
+	</delete>
+	
+	<delete id="delPlayListVideoByVideoNo" parameterType="int">
+	DELETE from
+		final_playlist_video
+	WHERE
+		video_no = #{value} 
+	</delete>
+	
+	<delete id="delPlaylistVideobyPlaylistNo" parameterType="int">
+		delete from
+			final_playlist_video
+		where 
+			playlist_no = #{value}
+	</delete>
+	
+	<delete id="delPlaylistByPlaylistNo" parameterType="int">
+		delete from
+			final_playlist
+		where
+			playlist_no = #{value}
+	</delete>
+	
+	<update id="updatePlaylist" parameterType="playlist">
+		update
+			final_playlist
+		set			
+			playlist_title = #{title},
+			playlist_subtitle = #{subTitle}
+		where
+			playlist_no = #{no}								
+	</update>
+	
+	<select id="getPlaylistByNo" parameterType="int" resultType="playlist">
+		select
+			playlist_no as no,
+			user_no as userNo,
+			playlist_title as title,
+			playlist_subtitle as subTitle
+		from
+			final_playlist
+		where
+			playlist_no = #{value}
+	</select>
+	
+	<select id="getPlvByListNo" parameterType="int" resultType="PlayListVideo">
+		select
+			PLAYLIST_NO						playlistNo,
+			VIDEO_NO						videoNo,
+			PLAYLIST_VIDEO_CREATE_DATE		playlistVideoCreateDate
+		from
+			final_playlist_video
+		where
+			playlist_no = #{value}
+	</select>
+	
+	<select id="getPlaylistVideoByListNo" parameterType="int" resultType="PlaylistVideoDto">
+		SELECT
+			a.playlist_video_create_date	plvVideoCreateDate,
+			b.PLAYLIST_NO			playlistNo,
+			b.PLAYLIST_TITLE		playlistTitle,
+			b.PLAYLIST_SUBTITLE		playlistSubtitle,
+			c.VIDEO_NO				videoNo,
+			c.CATE_NO				cateNo,
+			c.VIDEO_TITLE			videoTitle,
+			c.VIDEO_VIEWS			videoViews,
+			c.VIDEO_CREATE_DATE		videoCreateDate,
+			c.VIDEO_PUBLIC			videoPublic,
+			c.VIDEO_GRADE			videoGrade,
+			c.VIDEO_TAG				videoTag,
+			c.VIDEO_CONTENTS		videoContents,
+			c.LIKE_AMOUNT			likeAmount,
+			d.CHANNEL_NO			channelNo,
+			d.CHANNEL_TITLE			channelTitle,
+			d.CHANNEL_TAG			channelTag,
+			d.CHANNEL_ART_PATH		channelArtPath,
+			d.CHANNEL_CONTENT		channelContent,
+			e.USER_NO				userNo,
+			e.USER_NAME				userName,
+			e.USER_IMAGE_PATH		userImagePath,
+			f.VIDEO_PATH_NO			videoPathNo,
+			f.VIDEO_PATH			videoPath,
+			f.VIDEO_IMAGE			videoImage
+		FROM
+			FINAL_PLAYLIST_VIDEO a, FINAL_PLAYLIST b, FINAL_VIDEO c, FINAL_CHANNEL d, FINAL_USER e, FINAL_VIDEO_PATH_INFO f
+		WHERE
+			a.PLAYLIST_NO = b.PLAYLIST_NO
+		AND
+			a.VIDEO_NO = c.VIDEO_NO
+		AND
+			c.CHANNEL_NO = d.CHANNEL_NO
+		AND
+			c.VIDEO_NO = f.VIDEO_NO
+		AND
+			d.USER_NO = e.USER_NO
+		AND
+			a.PLAYLIST_NO = #{value}
+	</select>
+	
+	<select id="getPlaylistVideoByMap" parameterType="map" resultType="PlaylistVideoDto">
+		SELECT
+			a.playlist_video_create_date	plvVideoCreateDate,
+			b.PLAYLIST_NO					playlistNo,
+			b.PLAYLIST_TITLE				playlistTitle,
+			b.PLAYLIST_SUBTITLE				playlistSubtitle,
+			c.VIDEO_NO						videoNo,
+			c.CATE_NO						cateNo,
+			c.VIDEO_TITLE					videoTitle,
+			c.VIDEO_VIEWS					videoViews,
+			c.VIDEO_CREATE_DATE				videoCreateDate,
+			c.VIDEO_PUBLIC					videoPublic,
+			c.VIDEO_GRADE					videoGrade,
+			c.VIDEO_TAG						videoTag,
+			c.VIDEO_CONTENTS				videoContents,
+			c.LIKE_AMOUNT					likeAmount,
+			d.CHANNEL_NO					channelNo,
+			d.CHANNEL_TITLE					channelTitle,
+			d.CHANNEL_TAG					channelTag,
+			d.CHANNEL_ART_PATH				channelArtPath,
+			d.CHANNEL_CONTENT				channelContent,
+			e.USER_NO						userNo,
+			e.USER_NAME						userName,
+			e.USER_IMAGE_PATH				userImagePath,
+			f.VIDEO_PATH_NO					videoPathNo,
+			f.VIDEO_PATH					videoPath,
+			f.VIDEO_IMAGE					videoImage
+		FROM
+			FINAL_PLAYLIST_VIDEO a, FINAL_PLAYLIST b, FINAL_VIDEO c, FINAL_CHANNEL d, FINAL_USER e, FINAL_VIDEO_PATH_INFO f
+		WHERE
+			a.PLAYLIST_NO = b.PLAYLIST_NO
+		AND
+			a.VIDEO_NO = c.VIDEO_NO
+		AND
+			c.CHANNEL_NO = d.CHANNEL_NO
+		AND
+			c.VIDEO_NO = f.VIDEO_NO
+		AND
+			d.USER_NO = e.USER_NO
+		AND
+			a.PLAYLIST_NO = #{playlistno}
+		order by
+			<choose>
+				<when test="sort == null">
+					a.playlist_video_create_date desc				
+				</when>
+				<otherwise>
+					<choose>
+						<when test="sort == 'videocreateresent'">
+							a.playlist_video_create_date desc				
+						</when>
+						<when test="sort == 'videocreateold'">
+							a.playlist_video_create_date asc
+						</when>
+						<when test="sort == 'view'">
+							c.video_views desc
+						</when>
+						<when test="sort == 'latecreateresent'">
+							c.VIDEO_CREATE_DATE desc
+						</when>
+						<when test="sort == 'latecreateold'">
+							c.VIDEO_CREATE_DATE asc
+						</when>
+					</choose>
+				</otherwise>
+			</choose>		
+	</select>
+	
+	<select id="countPlaylistVideo" parameterType="int" resultType="int">
+		select
+			count(*)
+		from
+			final_playlist_video
+		where
+			playlist_no = #{value}
+	</select>
+	
+	<select id="getListVideoByDto" parameterType="playlistdto" resultType="playlistdto">
+		select 
+			playlist_no		playlistNo,
+			video_no		videoNo
+		from
+			final_playlist_video
+		where	
+			playlist_no = #{playlistNo}
+		and
+			video_no = #{videoNo}
+	</select>
+	
+	<select id="getPlayListSeq" resultType="int">
+		select 
+			final_playlist_seq.nextval
+		from 
+			dual
+	</select>
+	
+	<select id="getMyList" parameterType="int" resultType="playlist">
+		select
+			playlist_no as no,
+			user_no as userNo,
+			playlist_title as title,
+			playlist_subtitle as subTitle
+		from
+			final_playlist
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getPlayListByUserNoTitle" parameterType="playlist" resultType="playlist">
+		select
+			playlist_no as no,
+			user_no as userNo,
+			playlist_title as title,
+			playlist_subtitle as subTitle
+		from
+			final_playlist
+		where
+			user_no = #{userNo}
+		and
+			playlist_title = #{title}
+	</select>
+	
+	<select id="getPlayListNoInvideo" parameterType="int" resultType="int">
+		SELECT
+			PLAYLIST_NO
+		from
+			FINAL_PLAYLIST_VIDEO
+		WHERE
+			VIDEO_NO = #{value}
+	</select>
+</mapper>

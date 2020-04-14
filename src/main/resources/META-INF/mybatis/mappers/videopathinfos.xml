@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.VideoPathInfoDao">
+	
+	<select id="getAllHomeThumbnails" parameterType="map" resultType="HomeThumbnaildto">
+		SELECT
+			*
+		FROM
+			(select
+					ROW_NUMBER() OVER (ORDER BY b.video_no desc) num,
+					a.video_path_no			no,
+					a.video_no				videoNo,
+					a.video_path			path,
+					a.video_image			image,
+					d.user_no				userNo,
+					b.cate_no				cateNo,
+					c.channel_no			channelNo,
+					b.video_title			title,
+					b.video_create_date		createDate,
+					b.video_public			videoPublic,
+					b.video_grade			grade,
+					b.video_tag				tag,
+					b.video_views			views,
+					c.channel_title			channelTitle,
+					c.channel_tag			channelTag,
+					c.channel_art_path		artPath,
+					c.channel_content		content,
+					d.user_name				userName,
+					d.user_image_path		userImagePath		
+				from
+					final_video_path_info a, final_video b, final_channel c, final_user d
+				where
+					a.video_no = b.video_no
+				and
+					b.channel_no = c.channel_no
+				and 
+					c.user_no = d.user_no) x
+				WHERE
+					x.num >= #{begin}
+				AND
+					#{end} >= x.num
+	</select>
+	
+	<insert id="insertVideoPath" parameterType="VideoPathInfo">
+		<selectKey keyProperty="no" resultType="int" order="BEFORE">
+			select FINAL_VIDEO_PATH_SEQ.nextval from dual
+		</selectKey>
+		insert into final_video_path_info
+		(VIDEO_PATH_NO, VIDEO_NO, VIDEO_PATH, VIDEO_IMAGE)
+		values
+		(#{no}, #{videoNo}, #{path}, #{image})
+		
+	</insert>
+	
+	<select id="getVideoPathByVideoNo" parameterType="int" resultType="VideoPathInfo">
+		select
+			VIDEO_PATH_NO		no,
+			VIDEO_NO			videoNo,
+			VIDEO_PATH			path,
+			VIDEO_IMAGE			image
+		from
+			final_video_path_info
+		where
+			video_no = #{no}
+	</select>
+	
+	<select id="getHomeThumnailsByUserNo" resultType="HomeThumbnaildto" parameterType="int">
+		select
+			a.video_path_no			no,
+			a.video_no				videoNo,
+			a.video_path			path,
+			a.video_image			image,
+			d.user_no				userNo,
+			b.cate_no				cateNo,
+			c.channel_no			channelNo,
+			b.video_title			title,
+			b.video_create_date		createDate,
+			b.video_public			videoPublic,
+			b.video_grade			grade,
+			b.video_tag				tag,
+			b.video_views			views,
+			c.channel_title			channelTitle,
+			c.channel_tag			channelTag,
+			c.channel_art_path		artPath,
+			c.channel_content		content,
+			d.user_name				userName,
+			d.user_image_path		userImagePath		
+		from
+			final_video_path_info a, final_video b, final_channel c, final_user d
+		where
+			a.video_no = b.video_no
+		and
+			b.channel_no = c.channel_no
+		and 
+			c.user_no = d.user_no
+		and 
+			c.user_no = #{no}
+	</select>
+	
+	<select id="getHomeThumnailsByChannelNo" resultType="HomeThumbnaildto" parameterType="int">
+		select
+			a.video_path_no			no,
+			a.video_no				videoNo,
+			a.video_path			path,
+			a.video_image			image,
+			d.user_no				userNo,
+			b.cate_no				cateNo,
+			c.channel_no			channelNo,
+			b.video_title			title,
+			b.video_create_date		createDate,
+			b.video_public			videoPublic,
+			b.video_grade			grade,
+			b.video_tag				tag,
+			b.video_views			views,
+			c.channel_title			channelTitle,
+			c.channel_tag			channelTag,
+			c.channel_art_path		artPath,
+			c.channel_content		content,
+			d.user_name				userName,
+			d.user_image_path		userImagePath		
+		from
+			final_video_path_info a, final_video b, final_channel c, final_user d
+		where
+			a.video_no = b.video_no
+		and
+			b.channel_no = c.channel_no
+		and 
+			c.user_no = d.user_no
+		and 
+			c.channel_no = #{no}
+	</select>
+	
+	<select id="getHomeThumnailsByChannelNoLike" resultType="HomeThumbnaildto" parameterType="int">
+		select
+			a.video_path_no			no,
+			a.video_no				videoNo,
+			a.video_path			path,
+			a.video_image			image,
+			d.user_no				userNo,
+			b.cate_no				cateNo,
+			c.channel_no			channelNo,
+			b.video_title			title,
+			b.video_create_date		createDate,
+			b.video_public			videoPublic,
+			b.video_grade			grade,
+			b.video_tag				tag,
+			b.video_views			views,
+			c.channel_title			channelTitle,
+			c.channel_tag			channelTag,
+			c.channel_art_path		artPath,
+			c.channel_content		content,
+			d.user_name				userName,
+			d.user_image_path		userImagePath		
+		from
+			final_video_path_info a, final_video b, final_channel c, final_user d
+		where
+			a.video_no = b.video_no
+		and
+			b.channel_no = c.channel_no
+		and 
+			c.user_no = d.user_no
+		and 
+			c.channel_no = #{no}
+		order by
+			b.video_views desc
+	</select>
+	
+	<!-- 가장 조회수가 높은 동영상 조회하기 -->
+	<select id="BestViewVideoByChannelNo" resultType="HomeThumbnaildto" parameterType="int">
+		SELECT
+				a.video_path_no			no,
+				a.video_no				videoNo,
+				a.video_path			path,
+				a.video_image			image,
+				d.user_no				userNo,
+				b.cate_no				cateNo,
+				c.channel_no			channelNo,
+				b.video_title			title,
+				b.video_create_date		createDate,
+				b.video_public			videoPublic,
+				b.video_grade			grade,
+				b.video_tag				tag,
+				b.video_views			views,
+				c.channel_title			channelTitle,
+				c.channel_tag			channelTag,
+				c.channel_art_path		artPath,
+				c.channel_content		content,
+				d.user_name				userName,
+				d.user_image_path		userImagePath		
+		FROM (SELECT 
+					ROWNUM,
+					VIDEO_NO,
+					USER_NO,
+					CATE_NO,
+					CHANNEL_NO,
+					VIDEO_TITLE,
+					VIDEO_VIEWS,
+					VIDEO_CREATE_DATE,
+					VIDEO_PUBLIC,
+					VIDEO_GRADE,
+					VIDEO_TAG,
+					VIDEO_CONTENTS
+				FROM 
+					final_video
+				ORDER BY 
+					VIDEO_VIEWS desc) b, final_video_path_info a, final_channel c, final_user d
+		where
+			a.video_no = b.video_no
+		and
+			b.channel_no = c.channel_no
+		and 
+			c.user_no = d.user_no
+		and 
+			c.channel_no = #{no}
+		and
+			rownum = 1
+	</select>
+	
+	
+	<delete id="deleteVideoPath" parameterType="int">
+		delete from
+			final_video_path_info
+		where
+			VIDEO_NO = #{no}
+	</delete>
+</mapper>

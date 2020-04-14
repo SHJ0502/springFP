@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.SubscribeDao">
+
+ 	<insert id="insertSubscribe" parameterType="map">
+		insert into final_subscribe
+			(subscribe_no, user_no, channel_no)
+		values
+			(FINAL_SUBSCRIBE_SEQ.nextval, #{userno}, #{channelno})
+	</insert>
+
+	<select id="getSubscribeByUserNo" parameterType="int" resultType="HomeSubscribeByUserNo">
+		select
+			a.subscribe_no			no,
+			b.channel_no			channelNo,
+			b.channel_title			channelTitle,
+			b.channel_tag			channelTag,
+			b.channel_art_path		artPath,
+			b.channel_content		content,
+			c.user_no				userNo,
+			c.user_id				id,
+			c.user_password			password,
+			c.user_name				userName,
+			c.user_email			email,
+			c.user_create_date		createDate,
+			c.user_birthday			birthDay,
+			c.user_image_path		imagePath
+		from
+			final_subscribe a, final_channel b, final_user c
+		where
+			a.channel_no = b.channel_no
+		and
+			b.user_no = c.user_no
+		and
+			a.user_no = #{value}
+		order by
+			c.user_create_date asc
+	</select>
+	
+	<select id="selectSubscribeByMap" parameterType="map" resultType="Subscribe">
+		select
+			subscribe_no		no,
+			user_no				userNo,
+			channel_no			channelNo
+		from
+			final_subscribe
+		where
+			user_no = #{userno}
+		and
+			channel_no = #{channelno}
+	</select>
+	
+
+	
+	<select id="getCountSubscribe" parameterType="int" resultType="int">
+		select
+			count(*)
+		from
+			final_subscribe
+		where
+			user_no = #{value}
+	</select>
+	
+	<select id="getCountSubscribeByChannelNo" parameterType="int" resultType="int">
+		select
+			nvl(count(*), 0)
+		from
+			final_subscribe
+		where
+			channel_no = #{value}
+	</select>
+	
+	<delete id="deleteSubscribe" parameterType="map">
+		delete 
+			from final_subscribe
+		where
+			user_no = #{userno}
+		and
+			channel_no = #{channelno}					
+	 </delete>
+  	
+</mapper>

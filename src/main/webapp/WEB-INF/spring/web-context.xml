@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.2.xsd">
+
+	<!-- Spring mvc의 관련 빈 설정 -->
+	
+	<!-- Spring mvc와 관련된 아노테이션을 기반으로 웹애플리케이션이 동작되도록 지원하는 스프링의 클래스들이 컨테이너에 등록된다. -->
+	<mvc:annotation-driven/>
+	
+	<mvc:view-resolvers>
+		<mvc:jsp prefix="/WEB-INF/views/" suffix=".jsp"/>
+	</mvc:view-resolvers>
+
+	<context:component-scan base-package="kr.co.tffp.youtube.web"/>
+	
+	<!-- 
+		멀티파트요청을 처리하는 빈을 스프링 컨테이너에 등록한다.
+		xxxMultipartResolver는 첨부파일이 포함된 멀티파트 요청이 접수될 때
+		요청파라미터값의 조회와 첨부파일 업로드 처리를 지원하는 클래스다. 
+	-->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<!-- 지정된 컨트롤러 클래스를 스캔해서 스프링 컨테이너에 등록한다. -->
+	<context:component-scan base-package="kr.co.tffp.youtube.web.controller"></context:component-scan>
+	<context:component-scan base-package="kr.co.tffp.youtube.web.advice"></context:component-scan>
+	
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="kr.co.jhta.bookstore.web.interceptor.LoginCheckInterceptor"></bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="kr.co.jhta.bookstore.web.interceptor.GradeCheckInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+	
+	<!-- 
+		뷰리졸브 설정하기
+			*<mvc:jsp />는 InterResourceViewResolver를 등록시킨다.
+			*InternalResourceViewResolver는 InternalResourceView, JstView, RedirectView를 반환한다.
+			*prefix와 suffix는 jsp페이지의 경로 및 확장자를 뷰 이름에서 생략하기 위한 설정
+	 -->
+	 <mvc:view-resolvers order="2">
+	 	<mvc:jsp prefix="/WEB-INF/views/" suffix=".jsp" />
+	 </mvc:view-resolvers>
+	 
+	 <!-- 
+	 	요청핸들러 메소드가 뷰이름을 반환하는 경우 뷰이름과 일치하는 빈의 아이디를 가진 뷰 객체를 검색해서 
+	 	DispatcherServlet에게 제공하는 뷰리졸브다.
+	  -->
+	 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+	 	<property name="order" value="1"></property>
+	 </bean>
+	 
+	 <!-- 사용자 정의 View를 스프링의 빈으로 등록하기 -->
+	 <!-- <bean id="bookListXlsView" class="kr.co.jhta.bookstore.web.view.BookListXlsView"></bean>
+	 
+	 <bean id="fileDownloadView" class="kr.co.jhta.bookstore.web.view.FileDownloadView"></bean> -->
+	 
+	 <!-- 시스템 환경설정 정보를 읽어서 빈으로 등록 -->
+	   <context:property-placeholder location="classpath:/META-INF/config/application-config.properties" />
+	
+	
+</beans>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.ChannelDao">
+
+	<!-- 채널 생성하기 -->
+	<insert id="insertChannel" parameterType="Channel">
+		insert into FINAL_CHANNEL
+		(CHANNEL_NO, USER_NO, CHANNEL_TITLE, CHANNEL_TAG, CHANNEL_ART_PATH, CHANNEL_CONTENT)
+		values
+		(FINAL_CHANNEL_SEQ.nextval, #{userNo}, #{title}, #{tag}, #{artPath}, #{channelContent})
+	</insert>
+	
+	<!-- 채널 조회하기 -->
+	<select id="getChannelByNo" parameterType="int" resultType="Channel">
+		select
+			CHANNEL_NO			no,
+			USER_NO				userNo,
+			CHANNEL_TITLE		title,
+			CHANNEL_TAG			tag,
+			CHANNEL_ART_PATH	artPath,
+			CHANNEL_CONTENT		channelContent
+			
+		from
+			final_channel
+		where
+			channel_no = #{no}
+	</select>
+	
+	<!-- 유저번호로채널 조회하기 -->
+	<select id="getChannelByUserNo" parameterType="int" resultType="Channel">
+		select
+			CHANNEL_NO			no,
+			USER_NO				userNo,
+			CHANNEL_TITLE		title,
+			CHANNEL_TAG			tag,
+			CHANNEL_ART_PATH	artPath,
+			CHANNEL_CONTENT		channelContent
+			
+		from
+			final_channel
+		where
+			USER_NO = #{no}
+	</select>
+	
+	<!-- 채널번호로채널 조회하기 -->
+	<select id="getChannelByChannelNo" parameterType="int" resultType="Channel">
+		select
+			CHANNEL_NO			no,
+			USER_NO				userNo,
+			CHANNEL_TITLE		title,
+			CHANNEL_TAG			tag,
+			CHANNEL_ART_PATH	artPath,
+			CHANNEL_CONTENT		channelContent
+			
+		from
+			final_channel
+		where
+			CHANNEL_NO = #{no}
+	</select>
+	
+	<!-- 모든 채널정보 조회하기 -->
+	<select id="getAllChannel" resultType="Channel">
+		select
+			CHANNEL_NO			no,
+			USER_NO				userNo,
+			CHANNEL_TITLE		title,
+			CHANNEL_TAG			tag,
+			CHANNEL_ART_PATH	artPath,
+			CHANNEL_CONTENT		channelContent
+			
+		from
+			final_channel
+	</select>
+	
+	<!-- 채널번호 조회하기 -->
+	<select id="getChannelNo" resultType="int">
+		select 
+			FINAL_CHANNEL_SEQ.nextval
+		from 
+			dual
+	</select>
+	
+	<!-- 게시글 등록하기 -->
+	<insert id="insertCmntBoard" parameterType="CmntBoard">
+		insert into FINAL_CMNT_BOARD
+			(channel_cmnt_no, channel_no, channel_cmnt_title, channel_cmnt_content, channel_cmnt_create_date, channel_cmnt_file_path)
+		values
+			(FINAL_CMNT_COMMENT_SEQ.nextval, #{cmntNo}, #{cmntTitle}, #{cmntContent}, sysdate, #{cmntFilePath})
+	</insert>
+
+	<!-- 게시글에 댓글 등록하기 -->
+	<insert id="insertCmntComment" parameterType="CmntComment">
+		insert into FINAL_CMNT_COMMENT
+			(cmnt_comment_no, cmnt_no, cmnt_comment_content, cmnt_comment_create_date, user_no)
+		values
+			(FINAL_CHANNEL_CMNT_SEQ.nextval, #{cmntNo}, #{cmntComment}, sysdate, #{userNo})
+	</insert>
+	
+	<!-- 채널 번호에 해당하는 모든 게시글 가져오기 -->
+	<select id="getCmntBoardByChannelNo" parameterType="int" resultType="CmntBoard">
+		select
+			channel_cmnt_no				channelCmntNo,
+			channel_no					cmntNo,
+			channel_cmnt_title			cmntTitle,
+			channel_cmnt_content		cmntContent,
+			channel_cmnt_create_date	cmntCreateDate,
+			channel_cmnt_file_path		cmntFilePath
+		from
+			FINAL_CMNT_BOARD
+		where
+			channel_no = #{no}
+	</select>
+	
+	<!-- 게시글번호에 해당하는 모든 댓글 가져오기 -->
+	<select id="getCmntCommentByNo" parameterType="int" resultType="CmntBoard">
+		select
+			CMNT_COMMENT_NO					cmntCommentNo,
+			CMNT_NO							cmntNo,
+			CMNT_COMMENT_CONTENT			cmntComment,
+			CMNT_COMMENT_CREATE_DATE		cmntCommnetDate,
+			USER_NO							userNo
+		from
+			FINAL_CMNT_COMMENT
+		where
+			CMNT_NO = #{no}
+	</select>
+	
+	<select id="getChannelByKeyword" parameterType="string" resultType="ChannelUserDto">
+		select
+			a.channel_no			channelNo,
+			a.channel_title			title,
+			a.channel_tag			tag,
+			a.channel_art_path		artPath,
+			a.channel_content		content,
+			b.user_no				userNo,
+			b.user_id				id,
+			b.user_name				name,
+			b.user_image_path		imagePath,
+			b.user_email			mail,
+			b.user_birthday			birthday,
+			b.user_create_date		createDate
+		from
+			final_channel a, final_user b
+		where
+			a.user_no = b.user_no
+		and
+			(a.channel_title like '%' || #{value} || '%' or a.channel_tag like '%' || #{value} || '%')
+	</select>
+	
+	<!-- 커뮤니티 게시글 수정 -->
+	<update id="updateCmntBoard" parameterType="CmntBoard">
+		update FINAL_CMNT_BOARD set
+			channel_cmnt_title = #{cmntTitle},
+			channel_cmnt_content = #{cmntContent},
+			channel_cmnt_create_date = sysdate,
+			channel_cmnt_file_path = #{cmntFilePath}
+		where
+			channel_cmnt_no = #{no}
+	</update>
+	
+	<!-- 커뮤니티 게시글 삭제 -->
+	<delete id="deleteCmntBoard" parameterType="CmntBoard">
+		delete from FINAL_CMNT_BOARD
+		where
+			channel_cmnt_no = #{no}
+	</delete>
+	
+	<select id="getChannelUserBychannelNo" parameterType="int" resultType="ChannelUserDto">
+		select
+			a.CHANNEL_NO			channelNo,
+			a.USER_NO				userNo,
+			a.CHANNEL_TITLE			title,
+			a.CHANNEL_TAG			tag,
+			a.CHANNEL_ART_PATH		artPath,
+			a.CHANNEL_CONTENT		content,
+			b.USER_ID				id,
+			b.USER_NAME				name,
+			b.USER_EMAIL			mail,
+			b.USER_CREATE_DATE		createDate,
+			b.USER_BIRTHDAY			birthDay,
+			b.USER_IMAGE_PATH		imagePath
+		from
+			final_channel a, final_user b
+		where
+			a.user_no = b.user_no
+		and
+			a.channel_no = #{no}
+	</select>
+	
+	<update id="updateChannel" parameterType="Channel">
+		update 
+			final_channel
+		set
+			CHANNEL_ART_PATH = #{artPath},
+			CHANNEL_CONTENT = #{channelContent}
+		where
+			CHANNEL_NO = #{no}
+	</update>
+	
+	
+</mapper>

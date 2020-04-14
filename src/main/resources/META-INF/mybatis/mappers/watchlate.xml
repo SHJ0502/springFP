@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="kr.co.tffp.youtube.dao.WatchLateDao">
+	
+	<insert id="insertAfter" parameterType="map">
+		insert into final_watch_late
+			(watch_late_no, user_no, video_no)
+		values
+			(final_watch_late_seq.nextval, #{userno}, #{videono})
+	</insert>
+	
+	<delete id="deletewatchLate" parameterType="map">
+		DELETE 
+			from FINAL_WATCH_LATE
+		WHERE
+			user_no = #{userno}
+			and video_no = #{videono}
+	</delete>
+
+	<delete id="delWatchLateByVideoNo" parameterType="int">
+		DELETE 
+			from FINAL_WATCH_LATE
+		WHERE
+		    video_no = #{value}
+	</delete>
+	
+	<select id="getwatchlateList" parameterType="int" resultType="int">
+		select
+			video_no
+		from
+			final_watch_late
+		where
+			user_no = #{value}
+	</select>
+
+	<select id="getAfterByUserNo" parameterType="int" resultType="AfterThumnails">
+		SELECT
+			a.WATCH_LATE_NO			watchLateNo,
+			a.AFTER_DATE			afterDate,
+			b.VIDEO_NO				videoNo,
+			b.CATE_NO				cateNo,
+			b.VIDEO_TITLE			videoTitle,
+			b.VIDEO_VIEWS			videoviews,
+			b.VIDEO_CREATE_DATE		videoCreateDate,
+			b.VIDEO_PUBLIC			videoPublic,
+			b.VIDEO_GRADE			videoGrade,
+			b.VIDEO_TAG				videoTag,
+			b.VIDEO_CONTENTS		videoContent,
+			c.VIDEO_PATH_NO			videoPathNo,
+			c.VIDEO_PATH			videoPath,
+			c.VIDEO_IMAGE			videoImage,
+			d.CHANNEL_NO			channelNo,
+			d.channel_title			channelTitle,
+			d.channel_content		channelContent
+		FROM
+			FINAL_WATCH_LATE a, FINAL_VIDEO b, FINAL_VIDEO_PATH_INFO c, final_channel d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			b.VIDEO_NO = c.VIDEO_NO
+		AND
+			b.CHANNEL_NO = d.CHANNEL_NO
+		AND
+			a.USER_NO = #{value}
+		order by
+			a.after_date desc
+		</select>
+
+	<select id="getAfterListBymap" parameterType="map" resultType="AfterThumnails">
+		SELECT
+			a.WATCH_LATE_NO			watchLateNo,
+			a.AFTER_DATE			afterDate,
+			b.VIDEO_NO				videoNo,
+			b.CATE_NO				cateNo,
+			b.VIDEO_TITLE			videoTitle,
+			b.VIDEO_VIEWS			videoviews,
+			b.VIDEO_CREATE_DATE		videoCreateDate,
+			b.VIDEO_PUBLIC			videoPublic,
+			b.VIDEO_GRADE			videoGrade,
+			b.VIDEO_TAG				videoTag,
+			b.VIDEO_CONTENTS		videoContent,
+			c.VIDEO_PATH_NO			videoPathNo,
+			c.VIDEO_PATH			videoPath,
+			c.VIDEO_IMAGE			videoImage,
+			d.CHANNEL_NO			channelNo,
+			d.channel_title			channelTitle,
+			d.channel_content		channelContent
+		FROM
+			FINAL_WATCH_LATE a, FINAL_VIDEO b, FINAL_VIDEO_PATH_INFO c, final_channel d
+		WHERE
+			a.VIDEO_NO = b.VIDEO_NO
+		AND
+			b.VIDEO_NO = c.VIDEO_NO
+		AND
+			b.CHANNEL_NO = d.CHANNEL_NO
+		AND
+			a.USER_NO = #{userno}
+		order by
+			<choose>
+				<when test="sort == null">
+					a.after_date desc				
+				</when>
+				<otherwise>
+					<choose>
+						<when test="sort == 'videocreateresent'">
+							a.after_date desc				
+						</when>
+						<when test="sort == 'videocreateold'">
+							a.after_date asc
+						</when>
+						<when test="sort == 'view'">
+							b.video_views desc
+						</when>
+						<when test="sort == 'latecreateresent'">
+							b.VIDEO_CREATE_DATE desc
+						</when>
+						<when test="sort == 'latecreateold'">
+							b.VIDEO_CREATE_DATE asc
+						</when>
+					</choose>
+				</otherwise>
+			</choose>		
+	</select>
+	
+	<select id="countAfterByUserNo" parameterType="int" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			FINAL_WATCH_LATE
+		WHERE
+			USER_NO = #{value}
+	</select>
+	
+	<select id="selectAfterByMap" parameterType="map" resultType="WatchLate">
+		select
+			watch_late_no 		watchLateNo,
+			user_no				userNo,
+			video_no			videoNo,
+			after_date			afterDate
+		from
+			final_watch_late
+		where
+			user_no = #{userno}
+		and
+			video_no = #{videono}
+	</select>
+  	
+</mapper>
